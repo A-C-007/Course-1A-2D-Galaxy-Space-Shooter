@@ -11,23 +11,40 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject _tripleShotPrefab;
     [SerializeField]
+    private GameObject _greenOrbPrefab;
+    [SerializeField]
     private float _fireRate = 0.15f;
     private float _canFire;
+    [SerializeField]
+    private int _ammoCount = 15;
     [SerializeField]
     private int _lives = 3;
     private SpawnManager _spawnManager;
     [SerializeField]
     private bool _isTripleShotActive;
     [SerializeField]
-    private bool _isSpeedBoostActive;
+    private bool _isGreenOrbHomingMissileActive;
+    [SerializeField]
+    private bool _isPowerupSpeedBoostActive;
     [SerializeField]
     private bool _isShieldActive;
     [SerializeField]
-    private float _speedBoostMultiplier = 2.0f;
+    private float _powerupSpeedBoostMultiplier = 2.0f;
+    [SerializeField]
+    private float _lShiftThrustersSpeedMultiplier = 1.5f;
     [SerializeField]
     private float _boostedSpeed;
-    private Transform _shield;
+    [SerializeField]
+    private GameObject _shield;
+    [SerializeField]
+    private GameObject _orangeShield;
+    [SerializeField]
+    private GameObject _redShield;
+    [SerializeField]
+    private int _shieldStrength = 3;
 
+    [SerializeField]
+    private GameObject _thrusterImg;
     [SerializeField]
     private int _score;
 
@@ -43,15 +60,22 @@ public class Player : MonoBehaviour
     private AudioClip _laserSoundClip;
 
     private AudioManager _audioManager;
-
+    private CameraShake _cameraShake;
+    [SerializeField]
+    private float _thrusterPowerLevelValue = 10f;
+    [SerializeField]
+    private bool _canThrustersBeUsed = true;
+    
     void Start()
     {
+        _canThrustersBeUsed = true;
         
         transform.position = new Vector3(0, 0, 0);
         _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
         _uIManager = GameObject.Find("Canvas").GetComponent<UIManager>();
-        _shield = gameObject.transform.Find("Shield");
+        
         _audioSource = GetComponent<AudioSource>();
+        _cameraShake = GameObject.Find("Main Camera").GetComponent<CameraShake>();
 
         if (_spawnManager == null)
         {
@@ -74,6 +98,10 @@ public class Player : MonoBehaviour
         {
             Debug.LogError("The AudioManager is Null!");
         }
+
+        _ammoCount = 15;
+        _uIManager.UpdateAmmoCountText(_ammoCount);
+
     }
 
     
@@ -96,18 +124,50 @@ public class Player : MonoBehaviour
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
 
-        if (_isSpeedBoostActive == true)
+        if (_isPowerupSpeedBoostActive == true)
         {
-            _boostedSpeed = _speed * _speedBoostMultiplier;
+            _boostedSpeed = _speed * _powerupSpeedBoostMultiplier;
             transform.Translate(Vector3.right * horizontalInput * _boostedSpeed * Time.deltaTime);
             transform.Translate(Vector3.up * verticalInput * _boostedSpeed * Time.deltaTime);
+           
+        }
+        if (Input.GetKey(KeyCode.LeftShift) && _isPowerupSpeedBoostActive == false && _canThrustersBeUsed == true)
+        {
+            
+            _boostedSpeed = _speed * _lShiftThrustersSpeedMultiplier;
+            transform.Translate(Vector3.right * horizontalInput * _boostedSpeed * Time.deltaTime);
+            transform.Translate(Vector3.up * verticalInput * _boostedSpeed * Time.deltaTime);
+
+            _thrusterPowerLevelValue -= Time.deltaTime * 3f;
+            _uIManager.UpdateThrusterSlider(_thrusterPowerLevelValue);
+            if (_thrusterPowerLevelValue <= 0)
+            {
+                _uIManager.ThrusterSliderColor(false);
+                _canThrustersBeUsed = false;
+            }
+            
+
+        }
+        if (Input.GetKeyUp(KeyCode.LeftShift) && _isPowerupSpeedBoostActive == false)
+        {
+            
+            transform.Translate(Vector3.right * horizontalInput * _speed * Time.deltaTime);
+            transform.Translate(Vector3.up * verticalInput * _speed * Time.deltaTime);
             
         }
         else
         {
             transform.Translate(Vector3.right * horizontalInput * _speed * Time.deltaTime);
             transform.Translate(Vector3.up * verticalInput * _speed * Time.deltaTime);
+            
         }
+        
+        if (_canThrustersBeUsed == false)
+        {
+            StartCoroutine(ThrustersCoolDownRoutine());
+
+        }
+        
         
 
 
@@ -129,35 +189,71 @@ public class Player : MonoBehaviour
     void FireLaser()
     {
         
+        if (_ammoCount > 0)
+        {
             _canFire = Time.time + _fireRate;
 
-        if (_isTripleShotActive == true)
-        {
+            if (_isTripleShotActive == true)
+            {
 
-            Instantiate(_tripleShotPrefab, transform.position, Quaternion.identity);
+                Instantiate(_tripleShotPrefab, transform.position, Quaternion.identity);
 
+            }
+            else if(_isGreenOrbHomingMissileActive == true)
+            {
+                Instantiate(_greenOrbPrefab, transform.position + new Vector3(-0.027f, 1.314f, 0), Quaternion.identity);
+
+            }
+            else
+            {
+                Instantiate(_laserPrefab, transform.position + new Vector3(0.002f, 1.019f, 0), Quaternion.identity);
+
+            }
+
+            _ammoCount--;
+            _uIManager.UpdateAmmoCountText(_ammoCount);
+
+            _audioSource.PlayOneShot(_laserSoundClip);
         }
-        else
-        {
-            Instantiate(_laserPrefab, transform.position + new Vector3(0.002f, 1.019f, 0), Quaternion.identity);
-        }
-
-
-        _audioSource.PlayOneShot(_laserSoundClip);
-
 
         
     }
 
     public void Damage()
     {
+
+       _cameraShake.ShakeCamera(0.5f, .2f);
+        
         if(_isShieldActive == true)
         {
-            _isShieldActive = false;
-            if (_shield != null)
+            switch (_shieldStrength)
             {
-                _shield.transform.gameObject.SetActive(false);
+                case 3:
+                    _shieldStrength--;
+                    _shield.SetActive(false);
+                    _orangeShield.SetActive(true);
+                    _audioManager.PlayShieldHitSound();
+                    break;
+                case 2:
+                    _shieldStrength--;
+                    _orangeShield.SetActive(false);
+                    _redShield.SetActive(true);
+                    _audioManager.PlayShieldHitSound();
+                    
+
+                    break;
+                case 1:
+                    _shieldStrength--;
+                    _audioManager.PlayShieldHitSound();
+                    if (_shield != null)
+                    {
+                        _isShieldActive = false;
+                        _redShield.SetActive(false);
+                    }
+                    break;
+
             }
+            
             return;
         }
         else
@@ -170,6 +266,7 @@ public class Player : MonoBehaviour
                     break;
                 case 1:
                     _rightEngine.SetActive(true);
+                    
                     break;
             }
             _uIManager.UpdateLives(_lives);
@@ -195,8 +292,13 @@ public class Player : MonoBehaviour
 
     public void TripleShotActive()
     {
-
+        _isGreenOrbHomingMissileActive = false;
         _isTripleShotActive = true;
+        
+            _ammoCount += 10;
+        
+           
+        _uIManager.UpdateAmmoCountText(_ammoCount);
         StartCoroutine(TripleShotPowerDownRoutine());
 
         
@@ -211,7 +313,7 @@ public class Player : MonoBehaviour
     public void SpeedBoostActive()
     {
 
-        _isSpeedBoostActive = true;
+        _isPowerupSpeedBoostActive = true;
         StartCoroutine(SpeedBoostPowerDownRoutine());
 
     }
@@ -220,18 +322,63 @@ public class Player : MonoBehaviour
     {
 
         yield return new WaitForSeconds(5.0f);
-        _isSpeedBoostActive = false;
+        _isPowerupSpeedBoostActive = false;
     }
 
     public void ShieldActive()
     {
+        _shieldStrength = 3;
         _isShieldActive = true;
-        if (_shield != null)
-        {
-            _shield.transform.gameObject.SetActive(true);
-        }
+
+        _orangeShield.SetActive(false);
+        _redShield.SetActive(false);
+        _shield.SetActive(true);
+        
         
 
+    }
+    public void AmmoPowerup()
+    {
+        _ammoCount += 15;
+        _uIManager.UpdateAmmoCountText(_ammoCount);
+
+    }
+
+    public void HealthPowerup()
+    {
+        if (_lives < 3)
+        {
+            _lives++;
+            switch (_lives)
+            {
+                case 3:
+                    _leftEngine.SetActive(false);
+                    break;
+                case 2:
+                    _rightEngine.SetActive(false);
+                    break;
+                
+            }
+            _uIManager.UpdateLives(_lives);
+        }
+        return;
+    }
+
+    public void HomingGreenOrbPowerup()
+    {
+        if(_ammoCount == 0)
+        {
+            _ammoCount = 5;
+        }
+        _isTripleShotActive = false;
+        _isGreenOrbHomingMissileActive = true;
+        StartCoroutine(HomingGreenOrbPowerDownRoutine());
+    }
+
+    IEnumerator HomingGreenOrbPowerDownRoutine()
+    {
+        yield return new WaitForSeconds(5f);
+        _isGreenOrbHomingMissileActive = false;
     }
 
     public void UpdateScore(int scoreAmountToAdd)
@@ -244,6 +391,26 @@ public class Player : MonoBehaviour
         }
         
     }
-    //method to add 10 to score
-    //communicate to uimanager to add to score text
+
+    IEnumerator ThrustersCoolDownRoutine()
+    {
+        yield return new WaitForSeconds(1f);
+        if (_canThrustersBeUsed == false)
+        {
+            
+            _thrusterPowerLevelValue += Time.deltaTime;
+            
+            _uIManager.UpdateThrusterSlider(_thrusterPowerLevelValue);
+            
+            if (_thrusterPowerLevelValue >= 10f)
+            {
+                _uIManager.ThrusterSliderColor(true);
+
+                _canThrustersBeUsed = true;
+                StopCoroutine(ThrustersCoolDownRoutine());
+            }
+        }
+        
+    }
+    
 }

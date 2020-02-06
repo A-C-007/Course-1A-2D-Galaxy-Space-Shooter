@@ -10,6 +10,9 @@ public class SpawnManager : MonoBehaviour
     private GameObject _enemyContainer;
     [SerializeField]
     private GameObject[] _powerups;
+    [SerializeField]
+    private GameObject[] _rarePowerups;
+    
 
     private bool _stopSpawning = false;
 
@@ -32,7 +35,7 @@ public class SpawnManager : MonoBehaviour
 
         while (_stopSpawning == false)
         {
-            yield return new WaitForSeconds(Random.Range(1f, 3f));
+            yield return new WaitForSeconds(Random.Range(1f, 5f));
             float randomX = Random.Range(-9.42f, 9.42f);
             
             GameObject newEnemy = Instantiate(_enemyPrefab, new Vector3(randomX, 6.93f, 0), Quaternion.identity);
@@ -53,10 +56,23 @@ public class SpawnManager : MonoBehaviour
         yield return new WaitForSeconds(1f);
         while (_stopSpawning == false)
         {
-            yield return new WaitForSeconds(Random.Range(3f, 7f));
+            yield return new WaitForSeconds(Random.Range(5f, 10f));
             float randomX = Random.Range(-9.42f, 9.42f);
             Instantiate(_powerups[Random.Range(0, _powerups.Length)], new Vector3(randomX, 6.93f, 0), Quaternion.identity);
             
+
+        }
+        
+    }
+    IEnumerator RarePowerupSpawnRoutine()
+    {
+        yield return new WaitForSeconds(1f);
+        while (_stopSpawning == false)
+        {
+            yield return new WaitForSeconds(Random.Range(60f, 90f));
+            float randomX = Random.Range(-9.42f, 9.42f);
+            Instantiate(_rarePowerups[Random.Range(0, _rarePowerups.Length)], new Vector3(randomX, 6.93f, 0), Quaternion.identity);
+
 
         }
     }
@@ -66,5 +82,6 @@ public class SpawnManager : MonoBehaviour
         
         StartCoroutine(EnemySpawnRoutine());
         StartCoroutine(PowerupSpawnRoutine());
+        StartCoroutine(RarePowerupSpawnRoutine());
     }
 }

@@ -12,8 +12,10 @@ public class Enemy : MonoBehaviour
 
     private Animator _anim;
     private AudioManager _audioManager;
-
-    
+    private Collider2D _enemyCollider;
+    [SerializeField]
+    private GameObject _explosionPrefab;
+    private bool _isColliding = false;
     
     [SerializeField]
     private GameObject _dualEnemyLasersPrefab;
@@ -39,7 +41,7 @@ public class Enemy : MonoBehaviour
             Debug.LogError("The AudioManager is Null!");
         }
 
-        
+        _enemyCollider = this.gameObject.GetComponent<Collider2D>();
 
         StartCoroutine(FireEnemyLasersRoutine());
 
@@ -61,56 +63,76 @@ public class Enemy : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other)
     {
         Debug.Log("Hit: " + other.name);
-        
 
-        if (other.tag == "Player")
+        if (_isColliding == false)
         {
-            Player player = other.transform.GetComponent<Player>();
-
-            if (player != null)
+            if (other.tag == "Player")
             {
+                _isColliding = true;
+                Destroy(this.gameObject.GetComponent<Collider2D>());
+                Player player = other.transform.GetComponent<Player>();
 
-                player.Damage();
+                if (player != null)
+                {
+
+                    player.Damage();
+                }
+                _speed = 0;
+                //_anim.SetTrigger("OnEnemyDeath");
+                Instantiate(_explosionPrefab, transform.position, Quaternion.identity);
+                if (_audioManager != null)
+                {
+                    _audioManager.PlayExplosionSound();
+                }
+
+                //Destroy(this.gameObject, 2.05f);
+                Destroy(this.gameObject);
+
             }
-            _speed = 0;
-            _anim.SetTrigger("OnEnemyDeath");
-            if (_audioManager != null)
+            else if (other.tag == "Laser")
             {
-                _audioManager.PlayExplosionSound();
+                _isColliding = true;
+                Destroy(this.gameObject.GetComponent<Collider2D>());
+                Destroy(other.gameObject);
+                if (_player != null)
+                {
+
+                    _player.UpdateScore(10);
+                }
+                _speed = 0;
+                //_anim.SetTrigger("OnEnemyDeath");
+                Instantiate(_explosionPrefab, transform.position, Quaternion.identity);
+
+                if (_audioManager != null)
+                {
+                    _audioManager.PlayExplosionSound();
+                }
+                //Destroy(this.gameObject.GetComponent<Collider2D>());
+                //Destroy(this.gameObject, 2.05f);
+                Destroy(this.gameObject);
+
             }
-            Destroy(this.gameObject.GetComponent<Collider2D>());
-            Destroy(this.gameObject, 2.05f);
 
         }
-        else if (other.tag == "Laser")
-        {
-            Destroy(other.gameObject);
-            if (_player != null)
-            {
+        else return;
 
-                _player.UpdateScore(10);
-            }
-            _speed = 0;
-            _anim.SetTrigger("OnEnemyDeath");
-            if (_audioManager != null)
-            {
-                _audioManager.PlayExplosionSound();
-            }
-            Destroy(this.gameObject.GetComponent<Collider2D>());
-            Destroy(this.gameObject, 2.05f);
 
-        }
-        
     }
 
     IEnumerator FireEnemyLasersRoutine()
     {
         
+
+
         while (true)
         {
             yield return new WaitForSeconds(Random.Range(3f, 7f));
-            GameObject newEnemyLasers = Instantiate(_dualEnemyLasersPrefab, transform.position, Quaternion.identity);
-            newEnemyLasers.transform.parent = transform.parent;
+            if (_enemyCollider != null)
+            {
+                GameObject newEnemyLasers = Instantiate(_dualEnemyLasersPrefab, transform.position, Quaternion.identity);
+                newEnemyLasers.transform.parent = transform.parent;
+            }
+            
         }
 
     }

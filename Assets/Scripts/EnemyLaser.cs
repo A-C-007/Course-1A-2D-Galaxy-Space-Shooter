@@ -14,7 +14,7 @@ public class EnemyLaser : MonoBehaviour
     {
         _audioSource = GetComponent<AudioSource>();
 
-        AudioSource.PlayClipAtPoint(_laserShotClip, new Vector3(0, 0, -9));
+        AudioSource.PlayClipAtPoint(_laserShotClip, new Vector3(0, 0, -15));
 
     }
 

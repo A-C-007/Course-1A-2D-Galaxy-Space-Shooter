@@ -10,6 +10,10 @@ public class AudioManager : MonoBehaviour
     [SerializeField]
     private AudioClip _powerupSoundClip;
     // Start is called before the first frame update
+    [SerializeField]
+    private AudioClip _warningSoundClip;
+    [SerializeField]
+    private AudioClip _shieldHitSoundClip;
     void Start()
     {
         _audioSource = GetComponent<AudioSource>();
@@ -34,5 +38,13 @@ public class AudioManager : MonoBehaviour
     public void PlayPowerupSound()
     {
         _audioSource.PlayOneShot(_powerupSoundClip);
+    }
+    public void PlayWarningSound()
+    {
+        _audioSource.PlayOneShot(_warningSoundClip, 1);
+    }
+    public void PlayShieldHitSound()
+    {
+        _audioSource.PlayOneShot(_shieldHitSoundClip);
     }
 }
