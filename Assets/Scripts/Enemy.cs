@@ -19,6 +19,7 @@ public class Enemy : MonoBehaviour
     
     [SerializeField]
     private GameObject _dualEnemyLasersPrefab;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -126,7 +127,7 @@ public class Enemy : MonoBehaviour
 
         while (true)
         {
-            yield return new WaitForSeconds(Random.Range(3f, 7f));
+            yield return new WaitForSeconds(Random.Range(2f, 6f));
             if (_enemyCollider != null)
             {
                 GameObject newEnemyLasers = Instantiate(_dualEnemyLasersPrefab, transform.position, Quaternion.identity);

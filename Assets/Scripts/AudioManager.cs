@@ -14,6 +14,8 @@ public class AudioManager : MonoBehaviour
     private AudioClip _warningSoundClip;
     [SerializeField]
     private AudioClip _shieldHitSoundClip;
+    [SerializeField]
+    private AudioClip _engineExplosionSoundClip;
     void Start()
     {
         _audioSource = GetComponent<AudioSource>();
@@ -46,5 +48,9 @@ public class AudioManager : MonoBehaviour
     public void PlayShieldHitSound()
     {
         _audioSource.PlayOneShot(_shieldHitSoundClip);
+    }
+    public void PlayEngineExplosionSound()
+    {
+        _audioSource.PlayOneShot(_engineExplosionSoundClip);
     }
 }

@@ -11,7 +11,7 @@ public class SpawnManager : MonoBehaviour
     [SerializeField]
     private GameObject[] _powerups;
     [SerializeField]
-    private GameObject[] _rarePowerups;
+    private GameObject[] _rarePowerups; // set to spawn random range between 60-90 seconds
     
 
     private bool _stopSpawning = false;

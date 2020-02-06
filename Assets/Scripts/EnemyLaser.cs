@@ -9,6 +9,7 @@ public class EnemyLaser : MonoBehaviour
     [SerializeField]
     private AudioClip _laserShotClip;
     private AudioSource _audioSource;
+  
 
     private void Start()
     {

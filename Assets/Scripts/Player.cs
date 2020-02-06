@@ -60,6 +60,7 @@ public class Player : MonoBehaviour
     private AudioClip _laserSoundClip;
 
     private AudioManager _audioManager;
+    [SerializeField]
     private CameraShake _cameraShake;
     [SerializeField]
     private float _thrusterPowerLevelValue = 10f;
@@ -75,7 +76,7 @@ public class Player : MonoBehaviour
         _uIManager = GameObject.Find("Canvas").GetComponent<UIManager>();
         
         _audioSource = GetComponent<AudioSource>();
-        _cameraShake = GameObject.Find("Main Camera").GetComponent<CameraShake>();
+        
 
         if (_spawnManager == null)
         {
@@ -222,7 +223,7 @@ public class Player : MonoBehaviour
     public void Damage()
     {
 
-       _cameraShake.ShakeCamera(0.5f, .2f);
+       StartCoroutine(_cameraShake.Shake(0.2f, 0.08f));
         
         if(_isShieldActive == true)
         {
@@ -263,10 +264,12 @@ public class Player : MonoBehaviour
             {
                 case 2:
                     _leftEngine.SetActive(true);
+                    _audioManager.PlayEngineExplosionSound();
                     break;
                 case 1:
                     _rightEngine.SetActive(true);
-                    
+                    _audioManager.PlayEngineExplosionSound();
+
                     break;
             }
             _uIManager.UpdateLives(_lives);
