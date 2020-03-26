@@ -6,8 +6,14 @@ public class Laser : MonoBehaviour
 {
     [SerializeField]
     private float _speed = 8.0f;
-     
-    
+    //[SerializeField]
+   // private GameObject _player;
+
+    private void Start()
+    {
+       // _player
+    }
+
     void Update()
     {
 

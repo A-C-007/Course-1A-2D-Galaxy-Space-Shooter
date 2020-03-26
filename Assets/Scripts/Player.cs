@@ -13,10 +13,14 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject _greenOrbPrefab;
     [SerializeField]
+    private GameObject _explosionPrefab;
+    [SerializeField]
     private float _fireRate = 0.15f;
     private float _canFire;
     [SerializeField]
     private int _ammoCount = 15;
+    [SerializeField]
+    private int _maxAmmoCount = 50;
     [SerializeField]
     private int _lives = 3;
     private SpawnManager _spawnManager;
@@ -66,6 +70,8 @@ public class Player : MonoBehaviour
     private float _thrusterPowerLevelValue = 10f;
     [SerializeField]
     private bool _canThrustersBeUsed = true;
+
+
     
     void Start()
     {
@@ -102,6 +108,7 @@ public class Player : MonoBehaviour
 
         _ammoCount = 15;
         _uIManager.UpdateAmmoCountText(_ammoCount);
+        _uIManager.UpdateAmmoCountSlider(_ammoCount, _maxAmmoCount);
 
     }
 
@@ -113,8 +120,8 @@ public class Player : MonoBehaviour
         {
             FireLaser();
         }
+        CollectPickups();
         
-
         
         
     }
@@ -213,6 +220,7 @@ public class Player : MonoBehaviour
 
             _ammoCount--;
             _uIManager.UpdateAmmoCountText(_ammoCount);
+            _uIManager.UpdateAmmoCountSlider(_ammoCount, _maxAmmoCount);
 
             _audioSource.PlayOneShot(_laserSoundClip);
         }
@@ -289,6 +297,8 @@ public class Player : MonoBehaviour
             }
             
             _uIManager.GameOverSequence();
+            Instantiate(_explosionPrefab, transform.position, Quaternion.identity);
+
             Destroy(this.gameObject);
         }
     }
@@ -302,6 +312,7 @@ public class Player : MonoBehaviour
         
            
         _uIManager.UpdateAmmoCountText(_ammoCount);
+        _uIManager.UpdateAmmoCountSlider(_ammoCount, _maxAmmoCount);
         StartCoroutine(TripleShotPowerDownRoutine());
 
         
@@ -343,7 +354,12 @@ public class Player : MonoBehaviour
     public void AmmoPowerup()
     {
         _ammoCount += 15;
+        if(_ammoCount > _maxAmmoCount)
+        {
+            _ammoCount = _maxAmmoCount;
+        }
         _uIManager.UpdateAmmoCountText(_ammoCount);
+        _uIManager.UpdateAmmoCountSlider(_ammoCount, _maxAmmoCount);
 
     }
 
@@ -372,10 +388,46 @@ public class Player : MonoBehaviour
         if(_ammoCount == 0)
         {
             _ammoCount = 5;
+            _uIManager.UpdateAmmoCountSlider(_ammoCount,_maxAmmoCount);
+            _uIManager.UpdateAmmoCountText(_ammoCount);
         }
         _isTripleShotActive = false;
         _isGreenOrbHomingMissileActive = true;
         StartCoroutine(HomingGreenOrbPowerDownRoutine());
+    }
+
+    public void NegativeEclipsePickup()
+    {
+        if(_isShieldActive == true)
+        {
+            
+                _shieldStrength = 0;
+                _isShieldActive = false;
+
+                _orangeShield.SetActive(false);
+                _redShield.SetActive(false);
+                _shield.SetActive(false);
+
+
+
+            
+            
+        }
+        else if (_isShieldActive == false)
+        {
+            Damage();
+
+        }
+       
+        
+        if (_ammoCount >= 5)
+        {
+            _ammoCount -= 5;
+        }
+        _uIManager.UpdateAmmoCountText(_ammoCount);
+        _uIManager.UpdateAmmoCountSlider(_ammoCount, _maxAmmoCount);
+
+
     }
 
     IEnumerator HomingGreenOrbPowerDownRoutine()
@@ -392,7 +444,10 @@ public class Player : MonoBehaviour
 
             _uIManager.UpdateScoreText(_score);
         }
-        
+        if(_spawnManager != null)
+        {
+            _spawnManager.WaveReached(_score);
+        }
     }
 
     IEnumerator ThrustersCoolDownRoutine()
@@ -415,5 +470,27 @@ public class Player : MonoBehaviour
         }
         
     }
+
+    void CollectPickups()
+    {
+        if(Input.GetKey(KeyCode.C))
+        {
+
+
+            //find gameobjects with tag
+            var pickups = GameObject.FindGameObjectsWithTag("Pickup");
+            //for each loop
+            if (pickups != null)
+            {
+                foreach (var pickup in pickups)
+                {
+                    pickup.transform.position = Vector2.MoveTowards(pickup.transform.position, transform.position, _speed * Time.deltaTime);
+
+                }
+            }
+        }
+    }
+
+    
     
 }

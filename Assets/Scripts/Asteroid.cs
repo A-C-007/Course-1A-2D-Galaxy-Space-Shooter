@@ -46,7 +46,7 @@ public class Asteroid : MonoBehaviour
                 _audioManager.PlayExplosionSound();
             }
             Destroy(this.gameObject.GetComponent<Collider2D>());
-            _spawnManager.StartSpawning();
+            _spawnManager.StartSpawning(false);
             Destroy(this.gameObject, 1f);
 
 

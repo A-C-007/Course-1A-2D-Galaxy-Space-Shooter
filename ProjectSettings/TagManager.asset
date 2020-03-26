@@ -8,6 +8,10 @@ TagManager:
   - Laser
   - Enemy_Laser
   - GreenOrb
+  - Boss
+  - Pickup
+  - Negative_Pickup
+  - Enemy_Heat_Seeking_Missile
   layers:
   - Default
   - TransparentFX
@@ -18,7 +22,7 @@ TagManager:
   - 
   - 
   - Post Processing
-  - 
+  - Pickups
   - 
   - 
   - 

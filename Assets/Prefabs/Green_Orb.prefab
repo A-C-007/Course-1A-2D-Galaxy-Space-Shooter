@@ -11,13 +11,14 @@ GameObject:
   - component: {fileID: 7541318283526013017}
   - component: {fileID: 8540956711781176994}
   - component: {fileID: -8428008036826966124}
+  - component: {fileID: -917556182480644654}
   - component: {fileID: 3625668309267635788}
   - component: {fileID: 728041607095464977}
   - component: {fileID: 933674155306930211}
   - component: {fileID: -7206018276071903155}
   m_Layer: 0
   m_Name: Green_Orb
-  m_TagString: Laser
+  m_TagString: GreenOrb
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -93,12 +94,27 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6781124141498814674}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4d1fb13735cbf6041aa02a228d47cbe4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _Enemy: {fileID: 0}
+  _speed: 20
+  _rotateSpeed: 500
+--- !u!114 &-917556182480644654
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6781124141498814674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa0f6aaa7a87c4346bc3358020e8eb7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _enemies: []
   _speed: 20
   _rotateSpeed: 500
 --- !u!58 &3625668309267635788

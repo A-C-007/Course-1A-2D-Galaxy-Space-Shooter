@@ -16,6 +16,13 @@ public class AudioManager : MonoBehaviour
     private AudioClip _shieldHitSoundClip;
     [SerializeField]
     private AudioClip _engineExplosionSoundClip;
+    [SerializeField]
+    private AudioClip _EnemyArrivingSoundClip;
+    [SerializeField]
+    private AudioSource _bgAudioSource;
+    [SerializeField]
+    private AudioClip _bgAudioClip;
+
     void Start()
     {
         _audioSource = GetComponent<AudioSource>();
@@ -24,6 +31,8 @@ public class AudioManager : MonoBehaviour
         {
             Debug.LogError("The AudioSource on Audio_Manager is Null!");
         }
+
+        _bgAudioClip = _bgAudioSource.GetComponent<AudioClip>();
     }
 
     // Update is called once per frame
@@ -52,5 +61,11 @@ public class AudioManager : MonoBehaviour
     public void PlayEngineExplosionSound()
     {
         _audioSource.PlayOneShot(_engineExplosionSoundClip);
+    }
+    public void PlayEnemyArrivingSoundSound()
+    {
+
+        _bgAudioSource.clip = _EnemyArrivingSoundClip;
+        _bgAudioSource.Play();
     }
 }

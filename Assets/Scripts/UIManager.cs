@@ -11,13 +11,18 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private Text _gameOverText;
     [SerializeField]
+    private Text _youWinText;
+    [SerializeField]
     private Text _restartText;
     [SerializeField]
     private Text _ammoCountText;
     [SerializeField]
-    private bool _isGameOver;
+    private Text _wave2, _wave3, _boss;
     [SerializeField]
-    private float _gameOverFlickerRate = 0.5f;
+    private bool _isGameOver, _youWin;
+    
+    [SerializeField]
+    private float _flickerRate = 0.5f;
     [SerializeField]
     private Image _livesImg;
     [SerializeField]
@@ -26,7 +31,16 @@ public class UIManager : MonoBehaviour
     private Slider _thrustersSlider;
     [SerializeField]
     private GameObject _thrusterSliderFill;
-    private Image _sliderFillImage;
+    private Image _thrustersSliderFillImage;
+    [SerializeField]
+    private Slider _ammoSlider;
+    [SerializeField]
+    private GameObject _ammoSliderFill;
+    [SerializeField]
+    private Image _ammoSliderFillImage;
+
+    [SerializeField]
+    private SpawnManager _spawnManager;
 
     private GameManager _gameManager;
     private AudioManager _audioManager;
@@ -40,8 +54,8 @@ public class UIManager : MonoBehaviour
         _isGameOver = false;
         _gameManager = GameObject.Find("Game_Manager").GetComponent<GameManager>();
         _audioManager = GameObject.Find("Audio_Manager").GetComponent<AudioManager>();
-        _sliderFillImage = _thrusterSliderFill.GetComponent<Image>();
-
+        _thrustersSliderFillImage = _thrusterSliderFill.GetComponent<Image>();
+        
         
         if (_gameManager == null)
         {
@@ -55,6 +69,10 @@ public class UIManager : MonoBehaviour
 
         }
 
+        if (_ammoSliderFillImage == null)
+        {
+            Debug.LogError("Ammo Slider Fill Image is NULL");
+        }
     }
 
     // Update is called once per frame
@@ -83,6 +101,10 @@ public class UIManager : MonoBehaviour
 
     public void UpdateLives(int currentLives)
     {
+        if (currentLives < 0)
+        {
+            currentLives = 0;
+        }
         _livesImg.sprite = _livesSprites[currentLives];
 
     }
@@ -95,19 +117,65 @@ public class UIManager : MonoBehaviour
 
         StartCoroutine(FlashGameOverTextRoutine());
     }
+    public void YouWinSequence()
+    {
+        _youWin = true;
+        _restartText.gameObject.SetActive(true);
+        _gameManager.GameOver();
 
+        StartCoroutine(FlashYouWinTextRoutine());
+    }
     IEnumerator FlashGameOverTextRoutine()
     {
         while(_isGameOver == true)
         {
             _gameOverText.gameObject.SetActive(true);
-            yield return new WaitForSeconds(_gameOverFlickerRate);
+            yield return new WaitForSeconds(_flickerRate);
             _gameOverText.gameObject.SetActive(false);
-            yield return new WaitForSeconds(_gameOverFlickerRate);
+            yield return new WaitForSeconds(_flickerRate);
 
         }
             
 
+    }
+    IEnumerator FlashYouWinTextRoutine()
+    {
+        _gameManager.GameOver();
+        while (_youWin == true)
+        {
+            _youWinText.gameObject.SetActive(true);
+            yield return new WaitForSeconds(_flickerRate);
+            _youWinText.gameObject.SetActive(false);
+            yield return new WaitForSeconds(_flickerRate);
+
+        }
+
+
+    }
+
+
+    IEnumerator Wave2TextRoutine()
+    {
+        _wave2.gameObject.SetActive(true);
+        yield return new WaitForSeconds(2f);
+        _wave2.gameObject.SetActive(false);
+        _spawnManager.StartSpawning(false);
+    }
+
+    IEnumerator Wave3TextRoutine()
+    {
+        _wave3.gameObject.SetActive(true);
+        yield return new WaitForSeconds(2f);
+        _wave3.gameObject.SetActive(false);
+        _spawnManager.StartSpawning(false);
+    }
+
+    IEnumerator BossWaveTextRoutine()
+    {
+        _boss.gameObject.SetActive(true);
+        yield return new WaitForSeconds(2f);
+        _boss.gameObject.SetActive(false);
+        _spawnManager.StartSpawning(true);
     }
 
     public void UpdateThrusterSlider(float value)
@@ -121,11 +189,50 @@ public class UIManager : MonoBehaviour
     {
         if (canThrusterBeUsed == true)
         {
-            _sliderFillImage.color = Color.blue;
+            _thrustersSliderFillImage.color = Color.blue;
         }
         else if (canThrusterBeUsed == false)
         {
-            _sliderFillImage.color = Color.red;
+            _thrustersSliderFillImage.color = Color.red;
         }
     }
+
+    public void UpdateAmmoCountSlider(int value, int maxValue)
+    {
+        _ammoSlider.value = value;
+
+        if (value == 0)
+        {
+            _ammoSliderFillImage.color = Color.red;
+        }
+        else if (value == maxValue)
+        {
+            _ammoSliderFillImage.color = Color.blue;
+        }
+        else if(value < 100 && value > 0)
+        {
+            _ammoSliderFillImage.color = Color.cyan;
+        }
+
+        _ammoSlider.maxValue = maxValue;
+    }
+
+    public void DisplayWaveText(int w)
+    {
+        switch (w)
+        {
+            case 2:
+                StartCoroutine(Wave2TextRoutine());
+                break;
+            case 3:
+                StartCoroutine(Wave3TextRoutine());
+                break;
+            case 4:
+                StartCoroutine(BossWaveTextRoutine());
+                break;
+        }
+    }
+    
+
+    
 }

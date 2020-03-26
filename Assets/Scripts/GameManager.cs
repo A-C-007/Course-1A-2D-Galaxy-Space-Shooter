@@ -7,10 +7,13 @@ public class GameManager : MonoBehaviour
 {
 
     private bool _isGameOver;
+    Player _player;
     // Start is called before the first frame update
     void Start()
     {
         _isGameOver = false;
+        _player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
+      
     }
 
     // Update is called once per frame
@@ -36,6 +39,11 @@ public class GameManager : MonoBehaviour
     public void GameOver()
     {
         _isGameOver = true;
-
+        if(_player != null)
+        {
+            _player.enabled = false;
+        }
     }
+
+
 }

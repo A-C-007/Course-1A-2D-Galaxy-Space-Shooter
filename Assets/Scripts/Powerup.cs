@@ -62,6 +62,9 @@ public class Powerup : MonoBehaviour
                     case 5:
                         player.HomingGreenOrbPowerup();
                         break;
+                    case 6:
+                        player.NegativeEclipsePickup();
+                        break;
                     default:
                         Debug.Log("Default Value");
                         break;
@@ -69,7 +72,7 @@ public class Powerup : MonoBehaviour
                 }
                 
             }
-            if (_audioManager != null)
+            if (_audioManager != null && _powerupID != 6)
             {
                 _audioManager.PlayPowerupSound();
             }
