@@ -12,6 +12,7 @@ TagManager:
   - Pickup
   - Negative_Pickup
   - Enemy_Heat_Seeking_Missile
+  - Player_Target_img
   layers:
   - Default
   - TransparentFX

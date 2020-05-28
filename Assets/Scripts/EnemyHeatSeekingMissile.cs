@@ -87,6 +87,7 @@ public class EnemyHeatSeekingMissile : MonoBehaviour
         if (_target != null)
         {
             _targetImg = _target.gameObject.transform.Find("target_img");
+            
         }
 
         if (_targetImg != null)
@@ -99,6 +100,11 @@ public class EnemyHeatSeekingMissile : MonoBehaviour
         {
             if(_bossScript.isBossSpinning() == true)
             {
+                if (_targetImg != null)
+                {
+                    _targetImg.gameObject.SetActive(false);
+
+                }
                 Destroy(this.gameObject);
 
             }
@@ -124,7 +130,9 @@ public class EnemyHeatSeekingMissile : MonoBehaviour
             if (_targetImg != null)
             {
                 _targetImg.gameObject.SetActive(false);
+                
             }
+            
             Destroy(this.gameObject);
 
         }
@@ -133,7 +141,9 @@ public class EnemyHeatSeekingMissile : MonoBehaviour
             if (_targetImg != null)
             {
                 _targetImg.gameObject.SetActive(false);
+                
             }
+            
             Destroy(other.gameObject);
             
             Destroy(this.gameObject);
@@ -154,6 +164,7 @@ public class EnemyHeatSeekingMissile : MonoBehaviour
                 _targetImg.gameObject.SetActive(false);
             }
         }
+        _targetImg.gameObject.SetActive(false);
         Destroy(this.gameObject);
 
     }

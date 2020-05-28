@@ -1843,7 +1843,7 @@ GameObject:
   - component: {fileID: 926198207}
   m_Layer: 0
   m_Name: target_img
-  m_TagString: Untagged
+  m_TagString: Player_Target_img
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
